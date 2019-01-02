@@ -78,7 +78,7 @@ bool is_duplicated_column(const char board[9][9], int col, const char digit) {
   return false;
 }
 
-void get_empty_cell(char board[9][9], int &row, int &col) {
+void get_empty_cell(const char board[9][9], int &row, int &col) {
   for (int r = 0; r < 9; r++) {
     for (int c = 0; c < 9; c++) {
       if (board[r][c] == '.') {
@@ -110,7 +110,7 @@ bool get_row_and_column(const char * position, int& row, int& column) {
   return true;
 }
 
-bool is_valid_move(char board[9][9], int row, int column, const char digit) {
+bool is_valid_move(const char board[9][9], int row, int column, const char digit) {
   int number = digit - '0';
   if (number < 0 || number > 9) {
     cerr << "Number given is not between 0 and 9" << endl;
@@ -154,7 +154,7 @@ bool make_move(const char position[2], const char digit, char board[9][9]) {
     cerr << "position given is not on the board" << endl;
     return false;
   }
-  
+
   if (digit < '0' || digit > '9') {
     cerr << "Number given is not between 0 and 9" << endl;
     return false;
