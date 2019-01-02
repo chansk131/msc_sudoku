@@ -53,48 +53,6 @@ void print_row(const char* data, int row) {
   cout << "|" << endl;
 }
 
-/* pre-supplied function to display a Sudoku board */
-void display_board(const char board[9][9]) {
-  cout << "    ";
-  for (int r = 0; r < 9; r++) cout << (char)('1' + r) << "   ";
-  cout << endl;
-  for (int r = 0; r < 9; r++) {
-    print_frame(r);
-    print_row(board[r], r);
-  }
-  print_frame(9);
-}
-
-/* add your functions here */
-bool is_complete(const char board[9][9]) {
-  for (int r = 0; r < 9; r++) {
-    for (int c = 0; c < 9; c++) {
-      if (board[r][c] == '.') return false;
-    }
-  }
-  return true;
-}
-
-bool get_row_and_column(const char * position, int& row, int& column) {
-  if (position[2]) {
-    return false;
-  }
-  if (position[0]) {
-    row = position[0] - 'A';
-    if (row < 0 || row > 8) {
-      return false;
-    }
-  }
-  if (position[1]) {
-    column = position[1] - '0';
-    if (column < 0 || column > 8) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 bool is_duplicated_block(const char board[9][9], int row, int col, const char digit) {
   int block_row = row / 3;
   int block_col = col / 3;
@@ -120,6 +78,38 @@ bool is_duplicated_column(const char board[9][9], int col, const char digit) {
   return false;
 }
 
+void get_empty_cell(char board[9][9], int &row, int &col) {
+  for (int r = 0; r < 9; r++) {
+    for (int c = 0; c < 9; c++) {
+      if (board[r][c] == '.') {
+        row = r;
+        col = c;
+        return;
+      }
+    }
+  }
+}
+
+bool get_row_and_column(const char * position, int& row, int& column) {
+  if (position[2]) {
+    return false;
+  }
+  if (position[0]) {
+    row = position[0] - 'A';
+    if (row < 0 || row > 8) {
+      return false;
+    }
+  }
+  if (position[1]) {
+    column = position[1] - '0';
+    if (column < 0 || column > 8) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool is_valid_move(char board[9][9], int row, int column, const char digit) {
   int number = digit - '0';
   if (number < 0 || number > 9) {
@@ -127,41 +117,45 @@ bool is_valid_move(char board[9][9], int row, int column, const char digit) {
     return false;
   }
 
-  if (board[row][column] != '.') {
-    // cerr << "This cell is not free" << endl;
-    return false;
-  }
+  if (board[row][column] != '.') return false;
 
-  // check block
-  if (is_duplicated_block(board, row, column, digit)) {
-    // cerr << "Duplicate in the same block" << row << column << digit << endl;
-    return false;
-  }
-
-  // check row
-  if (is_duplicated_row(board, row, digit)) {
-    // cerr << "Duplicate in the same row" << row << column << digit << endl;
-    return false;
-  }
-
-  // check column
-  if (is_duplicated_column(board, column, digit)) {
-    // cerr << "Duplicate in the same column"  << row << column << digit << endl;
-    return false;
-  }
+  if (is_duplicated_block(board, row, column, digit)) return false;
+  if (is_duplicated_row(board, row, digit)) return false;
+  if (is_duplicated_column(board, column, digit)) return false;
 
   return true;
 }
 
+/* pre-supplied function to display a Sudoku board */
+void display_board(const char board[9][9]) {
+  cout << "    ";
+  for (int r = 0; r < 9; r++) cout << (char)('1' + r) << "   ";
+  cout << endl;
+  for (int r = 0; r < 9; r++) {
+    print_frame(r);
+    print_row(board[r], r);
+  }
+  print_frame(9);
+}
+
+/* add your functions here */
+bool is_complete(const char board[9][9]) {
+  for (int r = 0; r < 9; r++) {
+    for (int c = 0; c < 9; c++) {
+      if (board[r][c] == '.') return false;
+    }
+  }
+  return true;
+}
+
 bool make_move(const char position[2], const char digit, char board[9][9]) {
-  int row, column, number;
+  int row, column;
   if (!get_row_and_column(position, row, column)) {
     cerr << "position given is not on the board" << endl;
     return false;
   }
-
-  number = digit - '0';
-  if (number < 0 || number > 9) {
+  
+  if (digit < '0' || digit > '9') {
     cerr << "Number given is not between 0 and 9" << endl;
     return false;
   }
@@ -193,18 +187,6 @@ bool save_board(const char* filename, char board[9][9]) {
   out.close();
   
   return true;
-}
-
-void get_empty_cell(char board[9][9], int &row, int &col) {
-  for (int r = 0; r < 9; r++) {
-    for (int c = 0; c < 9; c++) {
-      if (board[r][c] == '.') {
-        row = r;
-        col = c;
-        return;
-      }
-    }
-  }
 }
 
 bool solve_board(char board[9][9]) {
