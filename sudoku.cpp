@@ -195,24 +195,32 @@ bool save_board(const char* filename, char board[9][9]) {
   return true;
 }
 
+void get_empty_cell(char board[9][9], int &row, int &col) {
+  for (int r = 0; r < 9; r++) {
+    for (int c = 0; c < 9; c++) {
+      if (board[r][c] == '.') {
+        row = r;
+        col = c;
+        return;
+      }
+    }
+  }
+}
+
 bool solve_board(char board[9][9]) {
   if (is_complete(board)) return true;
 
-  for (int row = 0; row < 9; row++) {
-    for (int column = 0; column < 9; column++) {
-      if (board[row][column] == '.') {
-        for (char digit = '1'; digit <= '9'; digit++) {
-          if (is_valid_move(board, row, column, digit)) {
-            board[row][column] = digit;
-            // display_board(board);
-            if (solve_board(board)) {
-              return true;
-            } else {
-              board[row][column] = '.';
-            }
-          }
-        }
-        return false;
+  int row, column;
+
+  get_empty_cell(board, row, column);
+  for (char digit = '1'; digit <= '9'; digit++) {
+    if (is_valid_move(board, row, column, digit)) {
+      board[row][column] = digit;
+      // display_board(board);
+      if (solve_board(board)) {
+        return true;
+      } else {
+        board[row][column] = '.';
       }
     }
   }
